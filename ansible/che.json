@@ -1,0 +1,60 @@
+{
+  "apiVersion": "v1",
+  "kind": "Namespace",
+  "metadata": {
+    "annotations": {
+      "openshift.io/sa.scc.mcs": "s0:c56,c5",
+      "openshift.io/sa.scc.supplemental-groups": "1003090000/10000",
+      "openshift.io/sa.scc.uid-range": "1003090000/10000"
+    },
+    "creationTimestamp": "2020-01-28T20:00:40Z",
+    "deletionTimestamp": "2020-01-28T20:09:46Z",
+    "name": "che",
+    "resourceVersion": "911049",
+    "selfLink": "/api/v1/namespaces/che",
+    "uid": "dbf956d3-4208-11ea-9920-0a738c65dbce"
+  },
+  "spec": {
+    "finalizers": []
+  },
+  "status": {
+    "conditions": [
+      {
+        "lastTransitionTime": "2020-01-28T20:09:54Z",
+        "message": "All resources successfully discovered",
+        "reason": "ResourcesDiscovered",
+        "status": "False",
+        "type": "NamespaceDeletionDiscoveryFailure"
+      },
+      {
+        "lastTransitionTime": "2020-01-28T20:09:54Z",
+        "message": "All legacy kube types successfully parsed",
+        "reason": "ParsedGroupVersions",
+        "status": "False",
+        "type": "NamespaceDeletionGroupVersionParsingFailure"
+      },
+      {
+        "lastTransitionTime": "2020-01-28T20:10:33Z",
+        "message": "All content successfully deleted, may be waiting on finalization",
+        "reason": "ContentDeleted",
+        "status": "False",
+        "type": "NamespaceDeletionContentFailure"
+      },
+      {
+        "lastTransitionTime": "2020-01-28T20:09:54Z",
+        "message": "Some resources are remaining: catalogsourceconfigs.operators.coreos.com has 1 resource instances",
+        "reason": "SomeResourcesRemain",
+        "status": "True",
+        "type": "NamespaceContentRemaining"
+      },
+      {
+        "lastTransitionTime": "2020-01-28T20:09:54Z",
+        "message": "Some content in the namespace has finalizers remaining: finalizer.catalogsourceconfigs.operators.coreos.com in 1 resource instances",
+        "reason": "SomeFinalizersRemain",
+        "status": "True",
+        "type": "NamespaceFinalizersRemaining"
+      }
+    ],
+    "phase": "Terminating"
+  }
+}

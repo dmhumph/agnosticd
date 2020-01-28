@@ -199,9 +199,8 @@
 
 # Fix AWS ELB connection timeout
 - name: Get ELB name
-  become_user: ec2-user
   shell: |
-    sudo -u ec2-user aws elb describe-load-balancers --region {{ aws_region }} | jq  '.LoadBalancerDescriptions |
+    aws elb describe-load-balancers --region {{ aws_region }} | jq  '.LoadBalancerDescriptions |
       map(select( .DNSName == "{{ r_router_default.resources[0].status.loadBalancer.ingress[0].hostname }}"))' |
       jq -r '.[0].LoadBalancerName'
   register: lbname
@@ -211,9 +210,8 @@
     msg: "Load balancer name: {{ lbname.stdout }}"
 
 - name: Fix load balancer
-  become_user: ec2-user
   shell: |
-    sudo -u ec2-user aws elb modify-load-balancer-attributes --region {{ aws_region }} --load-balancer-name {{ lbname.stdout }} --load-balancer-attributes "{\"ConnectionSettings\":{\"IdleTimeout\":300}}"
+    aws elb modify-load-balancer-attributes --region {{ aws_region }} --load-balancer-name {{ lbname.stdout }} --load-balancer-attributes "{\"ConnectionSettings\":{\"IdleTimeout\":300}}"
 
 # add keycloak realm
 - name: Get SSO username
