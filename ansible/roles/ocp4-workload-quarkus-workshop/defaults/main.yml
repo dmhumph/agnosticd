@@ -28,3 +28,4 @@ default_max_cpu: 1500m
 openshift_login: true
 openshift_token: XXXXXX
 openshift_url: api.ocp4.example.com
+insecure_skip_tls_verify: true
