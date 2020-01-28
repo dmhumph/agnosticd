@@ -1,13 +1,14 @@
----
 apiVersion: operators.coreos.com/v1
 kind: CatalogSourceConfig
 metadata:
   finalizers:
   - finalizer.catalogsourceconfigs.operators.coreos.com
   name: installed-redhat-codeready
-  namespace: openshift-marketplace
+  namespace: che
 spec:
   targetNamespace: che
+  #added the source to the spec to fix error condition
+  source: redhat-operators
   packages: codeready-workspaces
   csDisplayName: Red Hat Operators
   csPublisher: Red Hat
