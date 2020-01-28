@@ -15,6 +15,16 @@
     users: "{{ users | default([]) + ['user'+item | string] }}"
   loop: "{{ range(1,((num_users | int) + 1)) | list }}"
 
+
+- name: login as super user with token on OpenShift 4
+  shell: "oc login --token={{ openshift_token }}  --server={{ openshift_url }} --insecure-skip-tls-verify={{ insecure_skip_tls_verify }}"
+  when:
+   - openshift_token is defined
+   - openshift_token is not none
+   - openshift_token|trim() != ""
+   - openshift_login == "true"
+  ignore_errors: no
+
 # Figure out paths
 - name: extract api_url
   command: oc whoami --show-server

@@ -23,3 +23,8 @@ default_min_mem: 256Mi
 default_max_mem: 10Gi
 default_min_cpu: 500m
 default_max_cpu: 1500m
+
+
+openshift_login: true
+openshift_token: XXXXXX
+openshift_url: api.ocp4.example.com
