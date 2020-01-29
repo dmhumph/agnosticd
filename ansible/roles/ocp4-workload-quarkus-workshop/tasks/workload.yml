@@ -241,9 +241,13 @@
     status_code: 200,201,204
   register: sso_admin_token
 
+- name: Print SSO token connection info
+  debug:
+    msg: "Bearer {{ sso_admin_token.json.access_token }}"
+
 - name: Import realm
   uri:
-    url: http://keycloak-che.{{ route_subdomain }}/auth/admin/realms
+    url: http://keycloak-che.{{ route_subdomain }}/
     method: POST
     body_format: json
     headers:
