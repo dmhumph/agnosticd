@@ -265,60 +265,60 @@
   with_list: "{{ users }}"
 
 # Import stack definition
-# - name: Get Che admin token
-#   uri:
-#     url: http://keycloak-che.{{ route_subdomain }}/auth/realms/codeready/protocol/openid-connect/token
-#     method: POST
-#     body:
-#       username: admin
-#       password: admin
-#       grant_type: "password"
-#       client_id: "admin-cli"
-#     body_format: form-urlencoded
-#     status_code: 200,201,204
-#   register: che_admin_token
+- name: Get Che admin token
+  uri:
+    url: http://keycloak-che.{{ route_subdomain }}/auth/realms/codeready/protocol/openid-connect/token
+    method: POST
+    body:
+      username: admin
+      password: admin
+      grant_type: "password"
+      client_id: "admin-cli"
+    body_format: form-urlencoded
+    status_code: 200,201,204
+  register: che_admin_token
 
-# - name: Get admin token for che access
-#   debug:
-#     msg: "{{ che_admin_token }}"
+- name: Get admin token for che access
+  debug:
+    msg: "{{ che_admin_token }}"
 
-# - name: Import stack definition
-#   uri:
-#     url: http://codeready-che.{{ route_subdomain }}/stack/createStack
-#     method: POST
-#     headers:
-#       Content-Type: application/json
-#       Authorization: "Bearer {{ che_admin_token.json.access_token }}"
-#     body: "{{ lookup('file', './files/stack.json') }}"
-#     body_format: json
-#     ## accept 409 in case it already exists
-#     status_code: 201,409
+- name: Import stack definition
+  uri:
+    url: http://codeready-che.{{ route_subdomain }}/stack/createStack
+    method: POST
+    headers:
+      Content-Type: application/json
+      Authorization: "Bearer {{ che_admin_token.json.access_token }}"
+    body: "{{ lookup('file', './files/stack.json') }}"
+    body_format: json
+    ## accept 409 in case it already exists
+    status_code: 201,409
 
-# # Get stack definition
-# - name: Get stack definitions
-#   uri:
-#     url: http://codeready-che.{{ route_subdomain }}/stack
-#     method: GET
-#     headers:
-#       Authorization: "Bearer {{ che_admin_token.json.access_token }}"
-#     status_code: 200
-#   register: stack_definitions
+# Get stack definition
+- name: Get stack definitions
+  uri:
+    url: http://codeready-che.{{ route_subdomain }}/stack
+    method: GET
+    headers:
+      Authorization: "Bearer {{ che_admin_token.json.access_token }}"
+    status_code: 200
+  register: stack_definitions
 
-# - name: Set Stack permissions
-#   uri:
-#     url: http://codeready-che.{{ route_subdomain }}/permissions
-#     method: POST
-#     headers:
-#       Content-Type: application/json
-#       Authorization: "Bearer {{ che_admin_token.json.access_token }}"
-#     body:
-#       userId: "*"
-#       domainId: "stack"
-#       instanceId: "{{ item }}"
-#       actions: ["read", "search"]
-#     body_format: json
-#     status_code: 204
-#   with_list: "{{ stack_definitions | json_query('json[*].id') }}"
+- name: Set Stack permissions
+  uri:
+    url: http://codeready-che.{{ route_subdomain }}/permissions
+    method: POST
+    headers:
+      Content-Type: application/json
+      Authorization: "Bearer {{ che_admin_token.json.access_token }}"
+    body:
+      userId: "*"
+      domainId: "stack"
+      instanceId: "{{ item }}"
+      actions: ["read", "search"]
+    body_format: json
+    status_code: 204
+  with_list: "{{ stack_definitions | json_query('json[*].id') }}"
 
 # Adjust che limits
 - name: Delete default limitrange
@@ -333,72 +333,57 @@
 - shell: |
     oc create -f /tmp/che-limitrange.yaml -n che
 
-# - name: Import stack imagestream
-#   k8s:
-#     state: present
-#     merge_type:
-#     - strategic-merge
-#     - merge
-#     definition: "{{ lookup('template', item ) | from_yaml }}"
-#   loop:
-#   - ./templates/stack.imagestream.j2
+- name: Import stack imagestream
+  k8s:
+    state: present
+    merge_type:
+    - strategic-merge
+    - merge
+    definition: "{{ lookup('template', item ) | from_yaml }}"
+  loop:
+  - ./templates/stack.imagestream.j2
 
-# - name: Wait for ImageStream definition
-#   k8s_facts:
-#     kind: ImageStream
-#     name: quarkus-stack
-#     namespace: openshift
-#   register: r_imagestream_d
-#   retries: 200
-#   delay: 10
-#   ignore_errors: yes
-#   until: r_imagestream_d.resources | list | length == 1
+- name: Wait for ImageStream definition
+  k8s_facts:
+    kind: ImageStream
+    name: quarkus-stack
+    namespace: openshift
+  register: r_imagestream_d
+  retries: 200
+  delay: 10
+  ignore_errors: yes
+  until: r_imagestream_d.resources | list | length == 1
 
-# - name: print imagestream
-#   debug:
-#     msg: "imagestream: {{ r_imagestream_d }}"
+- name: print imagestream
+  debug:
+    msg: "imagestream: {{ r_imagestream_d }}"
 
-# - name: import imagestream
-#   shell: |
-#     oc import-image --all quarkus-stack -n openshift
+- name: import imagestream
+  shell: |
+    oc import-image --all quarkus-stack -n openshift
 
-# - name: Pre-create user workspaces
-#   include_tasks: create_che_workspace.yaml
-#   vars:
-#     user: "{{ item }}"
-#   with_list: "{{ users }}"
+- name: Pre-create user workspaces
+  include_tasks: create_che_workspace.yaml
+  vars:
+    user: "{{ item }}"
+  with_list: "{{ users }}"
 
 
   # Install Strimzi operator for all workspaces
   # Install Che via operator
-#- name: Create OpenShift Objects for Strimzi
-#  k8s:
-#    state: present
-#    merge_type:
-#    - strategic-merge
-#    - merge
-#    definition: "{{ lookup('file', item ) | from_yaml }}"
-#  loop:
-#  - ./files/strimzi_catalog_source.yaml
-#  - ./files/strimzi_subscription.yaml
-
-- name: Create operator
+- name: Create OpenShift Objects for Strimzi
   k8s:
     state: present
-    namespace: "openshift-operators"
-    definition: "{{ lookup('file', role_path ~ '/files/amq-streams/operator.yml' ) | from_yaml }}"
-
-- name: Wait until csv/{{ _amqstreams_csv_verison }} is Succeeded
-  command: >
-    oc get csv/{{ _amqstreams_csv_verison }} -o jsonpath='{.status.phase}' -n "openshift-operators"
-  register: streamscsv
-  retries: "200"
-  delay: "30"
-  until: streamscsv.stdout == "Succeeded"
+    merge_type:
+    - strategic-merge
+    - merge
+    definition: "{{ lookup('file', item ) | from_yaml }}"
+  loop:
+  - ./files/strimzi_catalog_source.yaml
+  - ./files/strimzi_subscription.yaml
 
 # Leave this as the last task in the playbook.
 - name: workload tasks complete
   debug:
     msg: "Workload Tasks completed successfully."
   when: not silent|bool
-

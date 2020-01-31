@@ -29,3 +29,5 @@ openshift_login: true
 openshift_token: XXXXXX
 openshift_url: api.ocp4.example.com
 insecure_skip_tls_verify: true
+
+_amqstreams_csv_verison: amqstreams.v1.3.0
