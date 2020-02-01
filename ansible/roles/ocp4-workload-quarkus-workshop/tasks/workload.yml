@@ -396,6 +396,12 @@
   delay: "30"
   until: streamscsv.stdout == "Succeeded"
 
+# Deploy nexus
+- name: Deploy nexus
+  import_tasks: ./nexus.yml
+#  become: true
+#  tags: nexus
+
 # Leave this as the last task in the playbook.
 - name: workload tasks complete
   debug:

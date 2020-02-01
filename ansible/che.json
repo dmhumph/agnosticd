@@ -3,16 +3,16 @@
   "kind": "Namespace",
   "metadata": {
     "annotations": {
-      "openshift.io/sa.scc.mcs": "s0:c73,c2",
-      "openshift.io/sa.scc.supplemental-groups": "1005260000/10000",
-      "openshift.io/sa.scc.uid-range": "1005260000/10000"
+      "openshift.io/sa.scc.mcs": "s0:c77,c74",
+      "openshift.io/sa.scc.supplemental-groups": "1006000000/10000",
+      "openshift.io/sa.scc.uid-range": "1006000000/10000"
     },
-    "creationTimestamp": "2020-01-31T19:32:05Z",
-    "deletionTimestamp": "2020-01-31T19:39:19Z",
+    "creationTimestamp": "2020-02-01T04:18:21Z",
+    "deletionTimestamp": "2020-02-01T04:28:02Z",
     "name": "che",
-    "resourceVersion": "2127206",
+    "resourceVersion": "2320016",
     "selfLink": "/api/v1/namespaces/che",
-    "uid": "5ca99090-4460-11ea-a7fb-02b9674f7e20"
+    "uid": "e1d2e2a1-44a9-11ea-ab52-066ea2e5c2aa"
   },
   "spec": {
     "finalizers": []
@@ -20,36 +20,36 @@
   "status": {
     "conditions": [
       {
-        "lastTransitionTime": "2020-01-31T19:39:26Z",
+        "lastTransitionTime": "2020-02-01T04:28:09Z",
         "message": "All resources successfully discovered",
         "reason": "ResourcesDiscovered",
         "status": "False",
         "type": "NamespaceDeletionDiscoveryFailure"
       },
       {
-        "lastTransitionTime": "2020-01-31T19:39:26Z",
+        "lastTransitionTime": "2020-02-01T04:28:09Z",
         "message": "All legacy kube types successfully parsed",
         "reason": "ParsedGroupVersions",
         "status": "False",
         "type": "NamespaceDeletionGroupVersionParsingFailure"
       },
       {
-        "lastTransitionTime": "2020-01-31T19:40:02Z",
-        "message": "All content successfully deleted, may be waiting on finalization",
-        "reason": "ContentDeleted",
-        "status": "False",
+        "lastTransitionTime": "2020-02-01T04:28:32Z",
+        "message": "Failed to delete all resource types, 1 remaining: unexpected items still remain in namespace: che for gvr: /v1, Resource=pods",
+        "reason": "ContentDeletionFailed",
+        "status": "True",
         "type": "NamespaceDeletionContentFailure"
       },
       {
-        "lastTransitionTime": "2020-01-31T19:39:26Z",
-        "message": "Some resources are remaining: catalogsourceconfigs.operators.coreos.com has 1 resource instances",
+        "lastTransitionTime": "2020-02-01T04:28:09Z",
+        "message": "Some resources are remaining: catalogsourceconfigs.operators.coreos.com has 1 resource instances, persistentvolumeclaims. has 1 resource instances, pods. has 4 resource instances",
         "reason": "SomeResourcesRemain",
         "status": "True",
         "type": "NamespaceContentRemaining"
       },
       {
-        "lastTransitionTime": "2020-01-31T19:39:26Z",
-        "message": "Some content in the namespace has finalizers remaining: finalizer.catalogsourceconfigs.operators.coreos.com in 1 resource instances",
+        "lastTransitionTime": "2020-02-01T04:28:09Z",
+        "message": "Some content in the namespace has finalizers remaining: finalizer.catalogsourceconfigs.operators.coreos.com in 1 resource instances, kubernetes.io/pvc-protection in 1 resource instances",
         "reason": "SomeFinalizersRemain",
         "status": "True",
         "type": "NamespaceFinalizersRemaining"
