@@ -56,4 +56,3 @@ nexus_admin_user: admin
 nexus_admin_password: admin123
 openshift_cli: oc
 project_admin: admin
->>>>>>> 0312eb2717e7b08e0d491eabe542054c04f3bffb
