@@ -13,13 +13,6 @@
   shell: |
          oc adm policy add-cluster-role-to-user cluster-admin opentlc-mgr
 
-# Create projects for user
-- name: create projects for users
-  include_tasks: create_project.yaml
-  vars:
-    user: "{{ item }}"
-  with_list: "{{ users }}"
-
 - name: ensure file exists
   copy:
     content: ""
@@ -38,10 +31,18 @@
 
 - name: Create the HTPasswd Secret to use the HTPasswd identity provider
   command:  oc create secret generic {{ htpasswd_secert_name }} --from-file=htpasswd=/tmp/{{ htpasswd_file_name }}  -n openshift-config
+  ignore_errors: yes
 
 - name: Deploy htpasswd-provider
   command: "oc create -f  /tmp/htpasswd-provider.yaml"
-  register: deployment_result
+  ignore_errors: yes
+  
+  # Create projects for user
+- name: create projects for users
+  include_tasks: create_project.yaml
+  vars:
+    user: "{{ item }}"
+  with_list: "{{ users }}"
 
 # Deploy guides
 - name: create guides project
