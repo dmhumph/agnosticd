@@ -7,7 +7,8 @@ metadata:
   name: installed-community-openshift-operators
   namespace: openshift-marketplace
 spec:
-  csDisplayName: Community Operators
-  csPublisher: Community
-  packages: strimzi-kafka-operator
+  csDisplayName: Red Hat Operators
+  csPublisher: Red Hat
   targetNamespace: openshift-operators
+  source: redhat-operators
+  packages: amq-streams
