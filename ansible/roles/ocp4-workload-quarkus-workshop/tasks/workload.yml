@@ -20,6 +20,29 @@
     user: "{{ item }}"
   with_list: "{{ users }}"
 
+- name: ensure file exists
+  copy:
+    content: ""
+    dest: /tmp/{{ htpasswd_file_name }}
+    force: no
+    group: root
+    owner: root
+    mode: 0755
+
+# Populate htaccess file for each user
+- name: create projects for users
+  command: htpasswd -B -b /tmp/{{ htpasswd_file_name }} {{ item }} {{ item | replace('user', 'pass') }}
+  vars:
+    user: "{{ item }}"
+  with_list: "{{ users }}"
+
+- name: Create the HTPasswd Secret to use the HTPasswd identity provider
+  command:  oc create secret generic {{ htpasswd_secert_name }} --from-file=htpasswd=/tmp/{{ htpasswd_file_name }}  -n openshift-config
+
+- name: Deploy htpasswd-provider
+  command: "oc create -f  /tmp/htpasswd-provider.yaml"
+  register: deployment_result
+
 # Deploy guides
 - name: create guides project
   k8s:
@@ -42,8 +65,8 @@
     -e OPENSHIFT_USER_PASSWORD='{{ workshop_openshift_user_password }}'
     -e MASTER_URL={{ master_url }}
     -e CONSOLE_URL={{ console_url }}
-    -e CHE_URL='{{ http_protocol }}codeready-che.{{ route_subdomain }}'
-    -e KEYCLOAK_URL='{{ http_protocol }}keycloak-che.{{ route_subdomain }}'
+    -e CHE_URL='http://codeready-che.{{ route_subdomain }}'
+    -e KEYCLOAK_URL='http://keycloak-che.{{ route_subdomain }}'
     -e ROUTE_SUBDOMAIN={{ route_subdomain }}
     -e CONTENT_URL_PREFIX='https://raw.githubusercontent.com/RedHatWorkshops/quarkus-workshop/master/docs/'
     -e WORKSHOPS_URLS='https://raw.githubusercontent.com/RedHatWorkshops/quarkus-workshop/master/docs/{{ workshop_labs_url }}'
@@ -124,7 +147,8 @@
 
 - name: wait for CRW to be running
   uri:
-    url: "{{ http_protocol }}codeready-che.{{ route_subdomain }}/dashboard/"
+    url: "http://codeready-che.{{ route_subdomain }}/dashboard/"
+    validate_certs: false
   register: result
   until: result.status == 200
   retries: "120"
@@ -173,7 +197,7 @@
 - name: wait for CRW to be running after PVC workaround
   when: (codeready_cm.resources[0].data.CHE_INFRA_KUBERNETES_PVC_WAIT__BOUND is undefined) or (codeready_cm.resources[0].data.CHE_INFRA_KUBERNETES_PVC_WAIT__BOUND == true)
   uri:
-    url: "{{ http_protocol }}codeready-che.{{ route_subdomain }}/dashboard/"
+    url: "http://codeready-che.{{ route_subdomain }}/dashboard/"
   register: result
   until: result.status == 200
   retries: "120"
@@ -229,11 +253,11 @@
 
 - name: Print SSO connection info
   debug:
-    msg: "url: {{ http_protocol }}keycloak-che.{{ route_subdomain }} username: {{ sso_admin_username.stdout }} password: {{ sso_admin_password.stdout }}"
+    msg: "url: http://keycloak-che.{{ route_subdomain }} username: {{ sso_admin_username.stdout }} password: {{ sso_admin_password.stdout }}"
 
 - name: Get SSO admin token
   uri:
-    url: "{{ http_protocol }}keycloak-che.{{ route_subdomain }}/auth/realms/master/protocol/openid-connect/token"
+    url: "http://keycloak-che.{{ route_subdomain }}/auth/realms/master/protocol/openid-connect/token"
     method: POST
     body:
       username: "{{ sso_admin_username.stdout }}"
@@ -250,7 +274,7 @@
 
 - name: Import realm
   uri:
-    url: "{{ http_protocol }}keycloak-che.{{ route_subdomain }}/"
+    url: "http://keycloak-che.{{ route_subdomain }}/"
     method: POST
     body_format: json
     headers:
@@ -270,7 +294,7 @@
 # Import stack definition
 # - name: Get Che admin token
 #   uri:
-#     url: {{ http_protocol }}keycloak-che.{{ route_subdomain }}/auth/realms/codeready/protocol/openid-connect/token
+#     url: http://keycloak-che.{{ route_subdomain }}/auth/realms/codeready/protocol/openid-connect/token
 #     method: POST
 #     body:
 #       username: admin
@@ -287,7 +311,7 @@
 
 # - name: Import stack definition
 #   uri:
-#     url: {{ http_protocol }}codeready-che.{{ route_subdomain }}/stack/createStack
+#     url: http://codeready-che.{{ route_subdomain }}/stack/createStack
 #     method: POST
 #     headers:
 #       Content-Type: application/json
@@ -300,7 +324,7 @@
 # # Get stack definition
 # - name: Get stack definitions
 #   uri:
-#     url: {{ http_protocol }}codeready-che.{{ route_subdomain }}/stack
+#     url: http://codeready-che.{{ route_subdomain }}/stack
 #     method: GET
 #     headers:
 #       Authorization: "Bearer {{ che_admin_token.json.access_token }}"
@@ -309,7 +333,7 @@
 
 # - name: Set Stack permissions
 #   uri:
-#     url: {{ http_protocol }}codeready-che.{{ route_subdomain }}/permissions
+#     url: http://codeready-che.{{ route_subdomain }}/permissions
 #     method: POST
 #     headers:
 #       Content-Type: application/json
