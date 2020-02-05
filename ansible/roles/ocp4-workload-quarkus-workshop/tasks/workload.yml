@@ -42,8 +42,8 @@
     -e OPENSHIFT_USER_PASSWORD='{{ workshop_openshift_user_password }}'
     -e MASTER_URL={{ master_url }}
     -e CONSOLE_URL={{ console_url }}
-    -e CHE_URL={{ http_protocol }}codeready-che.{{ route_subdomain }}
-    -e KEYCLOAK_URL={{ http_protocol }}keycloak-che.{{ route_subdomain }}
+    -e CHE_URL='{{ http_protocol }}codeready-che.{{ route_subdomain }}'
+    -e KEYCLOAK_URL='{{ http_protocol }}keycloak-che.{{ route_subdomain }}'
     -e ROUTE_SUBDOMAIN={{ route_subdomain }}
     -e CONTENT_URL_PREFIX='https://raw.githubusercontent.com/RedHatWorkshops/quarkus-workshop/master/docs/'
     -e WORKSHOPS_URLS='https://raw.githubusercontent.com/RedHatWorkshops/quarkus-workshop/master/docs/{{ workshop_labs_url }}'
@@ -124,7 +124,7 @@
 
 - name: wait for CRW to be running
   uri:
-    url: {{ http_protocol }}codeready-che.{{ route_subdomain }}/dashboard/
+    url: "{{ http_protocol }}codeready-che.{{ route_subdomain }}/dashboard/"
   register: result
   until: result.status == 200
   retries: "120"
@@ -173,7 +173,7 @@
 - name: wait for CRW to be running after PVC workaround
   when: (codeready_cm.resources[0].data.CHE_INFRA_KUBERNETES_PVC_WAIT__BOUND is undefined) or (codeready_cm.resources[0].data.CHE_INFRA_KUBERNETES_PVC_WAIT__BOUND == true)
   uri:
-    url: {{ http_protocol }}codeready-che.{{ route_subdomain }}/dashboard/
+    url: "{{ http_protocol }}codeready-che.{{ route_subdomain }}/dashboard/"
   register: result
   until: result.status == 200
   retries: "120"
@@ -233,7 +233,7 @@
 
 - name: Get SSO admin token
   uri:
-    url: {{ http_protocol }}keycloak-che.{{ route_subdomain }}/auth/realms/master/protocol/openid-connect/token
+    url: "{{ http_protocol }}keycloak-che.{{ route_subdomain }}/auth/realms/master/protocol/openid-connect/token"
     method: POST
     body:
       username: "{{ sso_admin_username.stdout }}"
@@ -250,7 +250,7 @@
 
 - name: Import realm
   uri:
-    url: {{ http_protocol }}keycloak-che.{{ route_subdomain }}/
+    url: "{{ http_protocol }}keycloak-che.{{ route_subdomain }}/"
     method: POST
     body_format: json
     headers:
