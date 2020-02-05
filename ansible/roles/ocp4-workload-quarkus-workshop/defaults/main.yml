@@ -11,6 +11,8 @@ workshop_openshift_user_name: userNN
 workshop_openshift_user_password: 'r3dh4t1!'
 workshop_che_user_name: userNN
 workshop_che_user_password: passNN
+enable_tls_che: false
+http_protocol: 'http://'
 
 workshop_shortenYn: N
 workshop_labs_url: "_workshop.yml"
