@@ -1,0 +1,38 @@
+# download url https://github.com/redhat-developer/codeready-workspaces-chectl/releases/download/20200205121647/crwctl-linux-x64.tar.gz
+# untar tar -zxvf crwctl-linux-x64.tar.gz
+# add path export PATH="$HOME/test-checli/crwctl/bin:$PATH"
+---
+- name: get user home directory
+  shell: "getent passwd {{ ansible_user }}  | awk -F: '{ print $6 }'"
+  changed_when: false
+  register: user_home
+
+- name: debug output
+  debug:
+    var: user_home.stdout
+
+- name: check if rules crwctl exists
+  stat: 
+    path: "{{ user_home.stdout }}/crwctl/crwctl/bin"
+  register: crwctl_exists
+
+- name: Download crwctl
+  get_url:
+    url: https://github.com/redhat-developer/codeready-workspaces-chectl/releases/download/20200205121647/crwctl-linux-x64.tar.gz
+    dest: "{{ user_home.stdout }}/crwctl-linux-x64.tar.gz"
+  when: crwctl_exists.stat.exists == False
+
+- name: Creates ~/crwctl directory
+  file:
+    path: "{{ user_home.stdout }}/crwctl"
+    state: directory
+  when: crwctl_exists.stat.exists == False
+
+- name: Extract crwctl-linux-x64.tar.gz into ~/crwctl
+  unarchive:
+    src: "{{ user_home.stdout }}/crwctl-linux-x64.tar.gz"
+    dest:  "{{ user_home.stdout }}/crwctl"
+  when: crwctl_exists.stat.exists == False
+
+- name: Test crwctl
+  command: "{{ user_home.stdout }}/crwctl/crwctl/bin/crwctl --help"
