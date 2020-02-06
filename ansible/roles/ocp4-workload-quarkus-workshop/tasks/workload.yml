@@ -35,6 +35,11 @@
   command:  oc create secret generic {{ htpasswd_secert_name }} --from-file=htpasswd=/tmp/{{ htpasswd_file_name }}  -n openshift-config
   ignore_errors: yes
 
+- name: Create a new htpasswd-provider.yaml
+  template:
+    src: ./templates/htpasswd-provider.yaml.j2
+    dest: /tmp/htpasswd-provider.yaml
+
 - name: Deploy htpasswd-provider
   command: "oc apply -f  /tmp/htpasswd-provider.yaml"
 
