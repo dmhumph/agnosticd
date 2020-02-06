@@ -1,6 +1,8 @@
 # vim: set ft=ansible
 ---
 # Implement your Workload deployment tasks here
+- name: Configure check
+  include_tasks: configure_chectl.yml
 
 # Nuke quotas
 - name: TODO - need to replace with proper quotas
@@ -34,9 +36,8 @@
   ignore_errors: yes
 
 - name: Deploy htpasswd-provider
-  command: "oc create -f  /tmp/htpasswd-provider.yaml"
-  ignore_errors: yes
-  
+  command: "oc apply -f  /tmp/htpasswd-provider.yaml"
+
   # Create projects for user
 - name: create projects for users
   include_tasks: create_project.yaml
@@ -390,11 +391,11 @@
 #   shell: |
 #     oc import-image --all quarkus-stack -n openshift
 
-# - name: Pre-create user workspaces
-#   include_tasks: create_che_workspace.yaml
-#   vars:
-#     user: "{{ item }}"
-#   with_list: "{{ users }}"
+- name: Pre-create user workspaces
+  include_tasks: create_che_workspace.yaml
+  vars:
+    user: "{{ item }}"
+  with_list: "{{ users }}"
 
 
   # Install Strimzi operator for all workspaces

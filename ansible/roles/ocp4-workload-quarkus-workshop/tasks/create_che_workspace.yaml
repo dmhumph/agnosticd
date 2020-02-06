@@ -12,13 +12,26 @@
     status_code: 200
   register: user_token
 
-- name: Import stack definition for {{ user }}
-  uri:
-    url: "http://codeready-che.{{ route_subdomain }}/api/workspace?start-after-create=true&namespace={{ user }}"
-    method: POST
-    headers:
-      Content-Type: application/json
-      Authorization: "Bearer {{ user_token.json.access_token }}"
-    body: "{{ lookup('file', './files/workspace.json') | replace('WORKSPACENAME', 'workspace-' + user) }}"
-    body_format: json
-    status_code: 201,409
+#- name: Import stack definition for {{ user }}
+#  uri:
+#    url: "http://codeready-che.{{ route_subdomain }}/api/workspace?start-after-create=true&namespace={{ user }}"
+#    method: POST
+#    headers:
+#      Content-Type: application/json
+#      Authorization: "Bearer {{ user_token.json.access_token }}"
+#    body: "{{ lookup('file', './files/workspace.json') | replace('WORKSPACENAME', 'workspace-' + user) }}"
+#    body_format: json
+#    status_code: 201,409
+
+- name: get user home directory
+  shell: "getent passwd {{ ansible_user }}  | awk -F: '{ print $6 }'"
+  changed_when: false
+  register: user_home
+
+- name: debug output
+  debug:
+    var: user_home.stdout
+
+
+- name: Test crwctl
+  command: "{{ user_home.stdout }}/crwctl/crwctl/bin/crwctl workspace:start --devfile=https://raw.githubusercontent.com/maxandersen/quarkus-quickstarts/che/devfile.yaml -n che --access-token {{ user_token.json.access_token }}"
