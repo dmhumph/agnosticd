@@ -124,3 +124,9 @@ bastion.cluster2.openshift.opentlc.com
 bastion.cluster3.openshift.opentlc.com
 bastion.cluster4.openshift.opentlc.com
 ----
+
+
+==== If custom resource definition hangs on deletion use the below command 
+```
+kubectl patch crd/checlusters.org.eclipse.che -p '{"metadata":{"finalizers":[]}}' --type=merge
+```

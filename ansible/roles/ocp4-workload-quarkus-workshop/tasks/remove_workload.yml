@@ -47,7 +47,7 @@
   - ./files/strimzi_subscription.yaml
 
 - name: Delete OpenShift htpasswd-provider
-  command: "oc delete -f  /tmp/htpasswd-provider.yaml"
+  command: "kubectl patch  oauth.config.openshift.io/cluster  -p '{"spec":{"identityProviders":[]}}' --type=merge"
 
 - name: Delete OpenShift Secret to use the HTPasswd identity provider
   command:  oc delete secret generic {{ htpasswd_secert_name }}  -n openshift-config
